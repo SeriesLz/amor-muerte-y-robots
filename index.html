@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Series Episodes</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+<style>
+body {
+background-color: #121212;
+color: #ffffff;
+font-family: Arial, sans-serif;
+margin: 0;
+padding: 0;
+}
+.container {
+padding: 20px;
+padding-bottom: 80px;
+}
+.video-container {
+position: relative; /* Antes estaba en fixed */
+width: 100%;
+padding-top: 56.25%; /* Mantiene la relación 16:9 */
+background-color: #121212;
+z-index: 1000;
+}
+
+.video-container iframe {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+border: none;
+}
+@media (max-width: 768px) {
+.video-container {
+position: fixed;
+top: 0;
+left: 0;
+}
+
+.content {
+margin-top: 56.25%;
+}
+}
+
+.dropdowns {
+display: flex;
+justify-content: space-between;
+margin-bottom: 20px;
+}
+.dropdowns select {
+background-color: #333;
+color: #fff;
+border: none;
+padding: 10px;
+font-size: 16px;
+border-radius: 5px;
+}
+.episode-list {
+list-style: none;
+padding: 0;
+max-height: 400px;
+overflow-y: auto;
+}
+.episode-item {
+display: flex;
+align-items: center;
+justify-content: space-between;
+background-color: #1e1e1e;
+padding: 10px;
+margin-bottom: 10px;
+border-radius: 5px;
+cursor: pointer;
+}
+.episode-item img {
+width: 80px;
+height: 45px;
+border-radius: 5px;
+margin-right: 10px;
+}
+.episode-info {
+flex-grow: 1;
+}
+.episode-info h3 {
+margin: 0;
+font-size: 18px;
+}
+.episode-info p {
+margin: 5px 0 0;
+color: #888;
+}
+.toggle {
+display: flex;
+align-items: center;
+}
+.toggle label {
+margin-right: 10px;
+}
+.toggle input[type="checkbox"] {
+width: 40px;
+height: 20px;
+appearance: none;
+background-color: #555;
+border-radius: 10px;
+position: relative;
+outline: none;
+cursor: pointer;
+}
+.toggle input[type="checkbox"]:checked {
+background-color: #0f0;
+}
+.toggle input[type="checkbox"]::before {
+content: '';
+position: absolute;
+width: 18px;
+height: 18px;
+background-color: #fff;
+border-radius: 50%;
+top: 1px;
+left: 1px;
+transition: 0.3s;
+}
+.toggle input[type="checkbox"]:checked::before {
+transform: translateX(20px);
+}
+.bottom-nav {
+position: fixed;
+bottom: 0;
+width: 100%;
+background-color: #312e2e;
+display: flex;
+justify-content: space-around;
+padding: 15px 0;
+}
+.bottom-nav a {
+color: #888;
+text-align: center;
+text-decoration: none;
+flex-grow: 1;
+}
+.bottom-nav a.active {
+color:rgb(136, 5, 5);
+}
+.bottom-nav a i {
+font-size: 24px;
+}
+.bottom-nav a span {
+display: block;
+font-size: 12px;
+margin-top: 4px;
+}
+
+.synopsis {
+display: none;
+background-color: #222;
+border-radius: 8px;
+padding: 10px;
+margin-bottom: 20px;
+font-size: 15px;
+line-height: 1.6;
+}
+
+.synopsis-button {
+background-color: #333;
+color: #fff;
+border: none;
+border-radius: 8px;
+padding: 10px 15px;
+cursor: pointer;
+font-size: 15px;
+margin-left: 10px;
+white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<!-- Video principal -->
+<div class="video-container">
+<iframe
+allowfullscreen
+id="main-video"
+src="https://seraphinapl.com/v/4sk5oqj8dibs"
+sandbox="allow-scripts allow-same-origin allow-presentation"
+></iframe>
+</div>
+
+
+<br>
+<div class="container">
+<div class="content">
+<div class="dropdowns">
+<select id="season-select">
+<option value="season1">Temporada 1</option>
+<option value="season2">Temporada 2</option>
+  <option value="season3">Temporada 3</option>
+  <option value="season4">Temporada 4</option>
+
+</select>
+<button class="synopsis-button" onclick="toggleSynopsis()">Ver sinopsis</button>
+</div>
+<div class="synopsis" id="synopsis">
+<p>Seres terroríficos, sorpresas retorcidas y humor negro convergen en esta antología de relatos animados para adultos presentada por Tim Miller y David Fincher.
+</p>
+</div>
+<h2>Love, Death & Robots</h2>
+
+<div id="last-watched-info" style="color: #ccc; margin-bottom: 10px;"></div>
+<div id="progress-info" style="color: #999; font-size: 14px; margin-bottom: 20px;"></div>
+<button id="reset-progress" style="
+background-color: #660000;
+color: white;
+border: none;
+padding: 10px 15px;
+border-radius: 8px;
+cursor: pointer;
+margin-bottom: 20px;
+">
+Reiniciar progreso
+</button>
+
+
+
+
+<ul class="episode-list" id="episode-list">
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/4sk5oqj8dibs" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/sZ17pLF47FoU9XAMgC7M7VruJwd.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 1</h3>
+<p>T1 - EP1</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="1" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/3zqbyoqlel32" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/A8gWMONLGaNrRrSwLUeZQD3VTpC.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 2</h3>
+<p>T1 - EP2</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="2" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/w0nm4ob405l9" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/6hbFg9eT0tNf4akHgBrfm1oEovI.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 3</h3>
+<p>T1 - EP3</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="3" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/jzktqs12eaeq" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/hY4vliUEatxJ57Z9dyjYWO0ekPV.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 4</h3>
+<p>T1 - EP4</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="4" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/8kb3t36zrwf0" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/uaKK5llVsHZQzZQrtKvPyyFVfvx.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 5</h3>
+<p>T1 - EP5</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="5" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/4ohd1myhynyy" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/q9JFOXkE7vEnzgqofZmdwbwjUj4.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 6</h3>
+<p>T1 - EP6</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="6" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/i5treymoaq77" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/zktA2EC6WVHS7bBZ18TLYw15x8w.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 7</h3>
+<p>T1 - EP7</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="7" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/b5yeor5tvhbd" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/jy4XXCYLMU55lnoyo1rJGbJLMy6.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 8</h3>
+<p>T1 - EP8</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="8" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/51jot6d8pcds" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/igeZxlYINielhtiqOLehdUbZlwL.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 9</h3>
+<p>T1 - EP9</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="9" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/pxx5yekalho3" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/g5Pif6iKPtuVSRjvCwJcBAQGvm0.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 10</h3>
+<p>T1 - EP10</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="10" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/8yxh1n3skv1b" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/7hm2OgzHpTrxNIvIlrXolgS8yfI.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 11</h3>
+<p>T1 - EP11</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="11" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/1t54t0q2xlhn" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/6lUT8F7DTmCVRvHckREIN9jBNSJ.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 12</h3>
+<p>T1 - EP12</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="12" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/wb0bfn82boh0" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/wj3SUp05OEJoQeGnqa9bLzu97IK.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 13</h3>
+<p>T1 - EP13</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="13" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/xgm3bsk7wg4c" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/a4gf1uN7QOX9fMtUa7BX1VP1upT.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 14</h3>
+<p>T1 - EP14</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="14" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/cqargvatcrqn" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/1SuMgkwHafvhn9zJMKYoq3oBt2y.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 15</h3>
+<p>T1 - EP15</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="15" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/jehylohxw3nc" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/gKxxV0FrhDUS4IOxNeFdv0uvdVd.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 16</h3>
+<p>T1 - EP16</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="16" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/sk59dyyaq9w1" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/AaClTdagruJjTJ8vSHzvoaPPQ53.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 17</h3>
+<p>T1 - EP17</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="17" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/v5v2cgjws65v" data-season="season1" >
+<img src="https://image.tmdb.org/t/p/w300/tvFeccyKYGDzsihSuw1KFHFxaDI.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 18</h3>
+<p>T1 - EP18</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="18" type="checkbox" />
+</div>
+</li>
+
+
+<!--PEGAR TEMPORADA ABAJO-->
+
+
+<!--TEMPORADA 2-->
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/0vfkg2uee2a8" data-season="season2" >
+<img src="https://image.tmdb.org/t/p/w300/83gWNrS0UYL6OzwVZZWJ5HW3RXV.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 1</h3>
+<p>T2 - EP1</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="1" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/ccpw3khwovyn" data-season="season2" >
+<img src="https://image.tmdb.org/t/p/w300/jxtsqdnH2LEeDF9hhnPytHiP8KY.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 2</h3>
+<p>T2 - EP2</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="2" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/e8ytbwi7mnwg" data-season="season2" >
+<img src="https://image.tmdb.org/t/p/w300/mHwDgy3MQBB9w9VfOwc3XIvSQYC.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 3</h3>
+<p>T2 - EP3</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="3" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/sy07rol3jq2s" data-season="season2" >
+<img src="https://image.tmdb.org/t/p/w300/flzgR1VCXkhUrmF4LOpksKtrsQD.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 4</h3>
+<p>T2 - EP4</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="4" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/cgsuyxnw0021" data-season="season2" >
+<img src="https://image.tmdb.org/t/p/w300/6MWXnEc6kSlcVnQ0Ig38Gnd15l5.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 5</h3>
+<p>T2 - EP5</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="5" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/ntid11ncl30c" data-season="season2" >
+<img src="https://image.tmdb.org/t/p/w300/l1iKe12zfv7chVZp4UO5ogjQtjh.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 6</h3>
+<p>T2 - EP6</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="6" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/gsgzjcn14ei5" data-season="season2" >
+<img src="https://image.tmdb.org/t/p/w300/lz7S0RSMz3KRYf4htKE0hOaKD5y.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 7</h3>
+<p>T2 - EP7</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="7" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/8chqvqqjjo5u" data-season="season2" >
+<img src="https://image.tmdb.org/t/p/w300/sg0NnFnDp8zs76e2IKSP53h4fqm.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 8</h3>
+<p>T2 - EP8</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="8" type="checkbox" />
+</div>
+</li>
+
+<!--Siguiente temporada debajo-->
+
+
+<!--TEMPORADA 3-->
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/whh7lb0fiaf3" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/kYaVkB6BTX74eKnNVwzSuc2NIFw.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 1</h3>
+<p>T3 - EP1</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="1" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/narh66t4s25m" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/3Q6kl5W3yzEgyBArcbdpyP5K36E.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 2</h3>
+<p>T3 - EP2</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="2" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/28kdidgfqhm1" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/rWxL3wTQSr2GvpsVRDNu445pcLp.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 3</h3>
+<p>T3 - EP3</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="3" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/ze14q1ollhv5" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/bgBoYrrlAbeHfXQg1oeZ4Wrxx1d.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 4</h3>
+<p>T3 - EP4</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="4" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/gxqv15ow0dl2" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/4ChlKwjGYs21sXnTANQAr5oSmms.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 5</h3>
+<p>T3 - EP5</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="5" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/adao5icaslzh" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/8pv09wbACu7gIRkmhcg6XZVbE59.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 6</h3>
+<p>T3 - EP6</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="6" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/56fpnj2zto23" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/xMsiWIgroQrz6WDIUnxhKtFTQKy.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 7</h3>
+<p>T3 - EP7</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="7" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/rmtuo2txwtsd" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/iEhkuECDZlvgN7CkoaXfS4qLGOy.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 8</h3>
+<p>T3 - EP8</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="8" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/k9ku1cf4vmgn" data-season="season3" >
+<img src="https://image.tmdb.org/t/p/w300/qWHGEsBFoh0Cq3AEWoMsxLZOayx.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 9</h3>
+<p>T3 - EP9</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="9" type="checkbox" />
+</div>
+</li>
+
+<!--Siguiente temporada debajo-->
+
+
+<!--TEMPORADA 4-->
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/ocpt3smxdhy4" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/lPFKSqL7EDAfupeUPmud6cTULWs.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 1</h3>
+<p>T4 - EP1</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="1" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/1vvr3l4vh0by" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/zU2jlC15Ug8e7VbA9tAUrHs6q8L.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 2</h3>
+<p>T4 - EP2</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="2" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/ujqy1i9nlyh7" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/vRBoKhCAtATNDCdjIyfK82I72I0.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 3</h3>
+<p>T4 - EP3</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="3" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/uo24hj42fouh" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/m5jU2Jp3i2orNph3SmdjKc9QYnz.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 4</h3>
+<p>T4 - EP4</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="4" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/ldwrfz311in1" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/taZ6BiMOYyPlONlE4wLX2xIu7D2.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 5</h3>
+<p>T4 - EP5</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="5" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/gcwhjn9tru72" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/5LYYsDxBXsckTAfufmK5rUZsTWn.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 6</h3>
+<p>T4 - EP6</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="6" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/fqssl57os12u" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/hT9IsRDbf4nQm3xCZTX9bWbpXDG.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 7</h3>
+<p>T4 - EP7</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="7" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/vhwgzzggu1li" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/pKUS3m0hiEvKyde7iqjUnxor9ti.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 8</h3>
+<p>T4 - EP8</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="8" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/kosw7t2yi163" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/ghLOPrbgqVwGIMjVLTYIILPPaov.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 9</h3>
+<p>T4 - EP9</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="9" type="checkbox" />
+</div>
+</li>
+
+<li class="episode-item" data-video-url="https://seraphinapl.com/v/lqqer08j96ia" data-season="season4" >
+<img src="https://image.tmdb.org/t/p/w300/5nihYKgO2WbSO2yWDvOqkbHEAFS.jpg" alt="Thumbnail">
+<div class="episode-info">
+<h3>Episode 10</h3>
+<p>T4 - EP10</p>
+</div>
+<div class="toggle">
+<label>NO VISTO</label>
+<input data-episode="10" type="checkbox" />
+</div>
+</li>
+
+<!--Siguiente temporada debajo-->
+
+
+
+
+
+
+
+
+
+
+
+
+<!--NO PASARSE ESTA ETIQUETA-->
+</ul>
+</div>
+</div>
+
+<!-- Navegación inferior -->
+<div class="bottom-nav">
+<div class="bottom-nav">
+<a href="https://lzrdrgz01.github.io/BuscadorLzPlay/">
+<i class="fa fa-arrow-left"></i>
+<span>Regresar</span>
+</a>
+<a href="https://lacinelocuradelzplayhdgratis.blogspot.com/">
+<i class="fas fa-home"></i>
+<span>Home</span>
+</a>
+<a href="https://lacinelocuradelzplayhdgratis.blogspot.com/search/label/Movie">
+<i class="fas fa-film"></i>
+<span>Movies</span>
+</a>
+</div>
+
+
+const serieId = "Love, Death & Robots";
+
+<script>
+const serieId = "Love, Death & Robots";
+
+document.addEventListener('DOMContentLoaded', function () {
+const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+const episodeItems = document.querySelectorAll('.episode-item');
+const mainVideo = document.getElementById('main-video');
+const seasonSelect = document.getElementById('season-select');
+const episodeList = document.getElementById('episode-list');
+const lastWatchedInfo = document.getElementById('last-watched-info');
+const progressInfo = document.getElementById('progress-info');
+
+// Mostrar estado de episodios
+checkboxes.forEach(function (checkbox) {
+const episode = checkbox.getAttribute('data-episode');
+const label = checkbox.previousElementSibling;
+const key = serieId + "-episode-" + episode;
+const storedStatus = localStorage.getItem(key) === 'true';
+
+checkbox.checked = storedStatus;
+label.textContent = storedStatus ? 'VISTO' : 'NO VISTO';
+
+checkbox.addEventListener('change', function () {
+const newStatus = checkbox.checked;
+localStorage.setItem(key, newStatus);
+label.textContent = newStatus ? 'VISTO' : 'NO VISTO';
+updateProgress();
+});
+
+checkbox.addEventListener('click', function (event) {
+event.stopPropagation();
+});
+});
+
+// Reproducir episodio y guardar último visto
+episodeItems.forEach(function (item) {
+item.addEventListener('click', function () {
+const videoUrl = item.getAttribute('data-video-url');
+const season = item.getAttribute('data-season');
+const episode = item.querySelector('input[type="checkbox"]').getAttribute('data-episode');
+
+mainVideo.src = videoUrl;
+
+localStorage.setItem(serieId + "-last-watched", videoUrl);
+localStorage.setItem(serieId + "-last-watched-season", season);
+localStorage.setItem(serieId + "-last-watched-ep", episode);
+
+updateLastWatched();
+});
+});
+
+// Filtro de temporadas
+seasonSelect.addEventListener('change', function () {
+const selectedSeason = seasonSelect.value;
+
+// Ocultar todos los episodios
+const allEpisodes = episodeList.querySelectorAll('.episode-item');
+allEpisodes.forEach(function (ep) {
+ep.style.display = 'none';
+});
+
+// Mostrar solo los de la temporada seleccionada
+const selectedEpisodes = episodeList.querySelectorAll('.episode-item[data-season="' + selectedSeason + '"]');
+selectedEpisodes.forEach(function (ep) {
+ep.style.display = 'flex';
+});
+
+updateProgress();
+});
+
+// Cargar último episodio automáticamente
+const lastVideo = localStorage.getItem(serieId + "-last-watched");
+if (lastVideo) {
+mainVideo.src = lastVideo;
+}
+
+function updateLastWatched() {
+const ep = localStorage.getItem(serieId + "-last-watched-ep");
+const season = localStorage.getItem(serieId + "-last-watched-season");
+if (ep && season) {
+lastWatchedInfo.textContent = "Último episodio visto: " + season.toUpperCase() + " - EP" + ep;
+} else {
+lastWatchedInfo.textContent = '';
+}
+}
+
+function updateProgress() {
+const selectedSeason = seasonSelect.value;
+const episodes = episodeList.querySelectorAll('.episode-item[data-season="' + selectedSeason + '"]');
+
+let total = 0;
+let vistos = 0;
+
+episodes.forEach(function (ep) {
+const checkbox = ep.querySelector('input[type="checkbox"]');
+total++;
+if (checkbox.checked) {
+vistos++;
+}
+});
+
+progressInfo.textContent = "Progreso: " + vistos + " de " + total + " episodios vistos";
+}
+
+// Reiniciar progreso
+document.getElementById('reset-progress').addEventListener('click', function () {
+if (confirm('¿Estás seguro de que deseas reiniciar todo el progreso?')) {
+const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+checkboxes.forEach(function (checkbox) {
+const episode = checkbox.getAttribute('data-episode');
+const key = serieId + "-episode-" + episode;
+localStorage.removeItem(key);
+checkbox.checked = false;
+checkbox.previousElementSibling.textContent = 'NO VISTO';
+});
+
+localStorage.removeItem(serieId + "-last-watched");
+localStorage.removeItem(serieId + "-last-watched-ep");
+localStorage.removeItem(serieId + "-last-watched-season");
+
+document.getElementById('main-video').src = '';
+lastWatchedInfo.textContent = '';
+progressInfo.textContent = 'Progreso: 0 episodios vistos';
+}
+});
+
+// Inicializar
+seasonSelect.dispatchEvent(new Event('change'));
+updateLastWatched();
+});
+
+// Función para mostrar/ocultar la sinopsis
+function toggleSynopsis() {
+const synopsis = document.getElementById('synopsis');
+const button = document.querySelector('.synopsis-button');
+if (synopsis.style.display === 'none' || synopsis.style.display === '') {
+synopsis.style.display = 'block';
+button.innerText = 'Ocultar sinopsis';
+} else {
+synopsis.style.display = 'none';
+button.innerText = 'Ver sinopsis';
+}
+}
+</script>
+
+</body>
+</html>
